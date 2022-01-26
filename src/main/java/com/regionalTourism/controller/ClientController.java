@@ -24,8 +24,23 @@ public class ClientController {
 
      return clientService.createClient(documentClient,firstName,lastName,age,email);
 
-
         }
+
+    @PostMapping("/deleteLogicClient")
+    @ResponseBody
+    public ResponseEntity deleteLogicClient(Integer idClient) {
+
+        return clientService.deleteLogicClient(idClient);
+
+    }
+
+    @PostMapping("/updateClient")
+    @ResponseBody
+    public ResponseEntity updateClient(Integer idClient, String documentClient,String firstName, String lastName, Integer age, String email,Integer status) {
+
+        return clientService.updateClient(idClient,documentClient,firstName,lastName,age,email,status);
+
+    }
 
     }
 

@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+
 @CommonsLog
 @Service
 public class ClientService {
@@ -20,6 +22,36 @@ public class ClientService {
 
     public ClientService(SqlSession sqlSession) {
         this.sqlSession = sqlSession;
+    }
+
+
+    public ResponseEntity updateClient(Integer idClient, String documentClient,String firstName, String lastName, Integer age, String email,Integer status){
+
+        JsonObject response = new JsonObject();
+        Client client= null;
+        try {
+            if (idClient != null) {
+                client = this.sqlSession.selectOne("getClientById", idClient);
+
+            }
+            if (client != null) {
+                client.setDocumentClient(documentClient);
+                client.setFirstName(firstName);
+                client.setLastName(lastName);
+                client.setAge(age);
+                client.setEmail(email);
+                client.setStatus(status);
+                sqlSession.update("updateClient", client);
+
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            ResponseEntity<Integer> responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return responseEntity;
+        }
+
+
+        return GeneralUtils.createOkResponse(response.toString());
     }
 
     public ResponseEntity createClient(String documentClient,String firstName,String lastName, Integer age, String email){
@@ -47,5 +79,30 @@ public class ClientService {
             }
         return GeneralUtils.createOkResponse(response.toString());
 
+    }
+
+    public ResponseEntity deleteLogicClient(Integer idClient){
+        JsonObject response = new JsonObject();
+        log.info("deleteLogicClientr: " + idClient);
+        if(idClient==null){
+            ResponseEntity entity = new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return entity;
+        }
+        //Hashmap para pasar customerUserId a myBatis
+        HashMap<String, Integer> options = new HashMap<>();
+        options.put("idClient", idClient);
+        try {
+            this.sqlSession.update("deleteLogicClient", options);
+
+            log.info("[CLIENT SERVICE] Client deleted Successfully! ");
+
+            response.addProperty("status", "success");
+            response.addProperty("message", "Client deleted successfully");
+        }catch (Exception e){
+            ResponseEntity entity = new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return entity;
+
+        }
+        return GeneralUtils.createOkResponse(response.toString());
     }
 }

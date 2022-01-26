@@ -4,6 +4,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.regionalTourism.mapper.ClientMapper">
 
+    <select id="getClientById" resultType="Client">
+        select * from clients where idClient= #{idClient} and status = 1
+    </select>
 
     <insert id="insertClient" parameterType="Client" useGeneratedKeys="true" keyProperty="idClient"  keyColumn="idClient">
         INSERT clients
@@ -12,5 +15,20 @@
             (#{documentClient},#{firstName},#{lastName},#{age},#{email},1)
     </insert>
 
+    <update id="deleteLogicClient" parameterType="Client">
+        update clients set
+        status=0
+        where idClient = #{idClient};
+    </update>
 
+    <update id="updateClient"  parameterType="Client">
+        update clients set
+                                    documentClient = #{documentClient},
+                                    firstNameClient = #{firstName},
+                                    lastNameClient =#{lastName},
+                                    age = #{age},
+                                    email = #{email},
+                                    status = #{status}
+        where idClient = #{idClient}
+    </update>
 </mapper>
