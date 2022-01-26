@@ -1,4 +1,4 @@
-package com.regionalTourism.demo;
+package com.regionalTourism;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
