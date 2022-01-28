@@ -24,66 +24,68 @@ public class ClientService {
         this.sqlSession = sqlSession;
     }
 
-
-    public ResponseEntity updateClient(Integer idClient, String documentClient,String firstName, String lastName, Integer age, String email,Integer status){
+    public Client getAllClients(){
 
         JsonObject response = new JsonObject();
-        Client client= null;
+        Client client = this.sqlSession.selectOne("getAllClients",null);
+        System.out.println(client);
+        response.add("data", Constants.GSON.toJsonTree(client));
+        response.addProperty("status", "success");
+        response.addProperty("message", "Successfully Registered");
+
+        return  client;
+
+    }
+
+    public ResponseEntity<JsonObject> updateClient(Client client){
+
+        JsonObject response = new JsonObject();
+        Client updateClient = new Client();
         try {
-            if (idClient != null) {
-                client = this.sqlSession.selectOne("getClientById", idClient);
+            if (client != null) {
+                updateClient = this.sqlSession.selectOne("getClientById", client.getIdClient());
+                System.out.println("1");
 
             }
-            if (client != null) {
-                client.setDocumentClient(documentClient);
-                client.setFirstName(firstName);
-                client.setLastName(lastName);
-                client.setAge(age);
-                client.setEmail(email);
-                client.setStatus(status);
+            if (updateClient != null) {
+                System.out.println("2");
                 sqlSession.update("updateClient", client);
+                response.add("data", Constants.GSON.toJsonTree(client));
+                response.addProperty("status", "success");
+                response.addProperty("message", "Successfully Registered");
 
             }
         }catch (Exception e){
             e.printStackTrace();
-            ResponseEntity<Integer> responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            ResponseEntity<JsonObject> responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             return responseEntity;
         }
 
-
-        return GeneralUtils.createOkResponse(response.toString());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    public ResponseEntity createClient(String documentClient,String firstName,String lastName, Integer age, String email){
+    public ResponseEntity<JsonObject> createClient(Client clientT){
         JsonObject response = new JsonObject();
-            if(documentClient ==null || firstName ==null || lastName==null || age==null || email==null ){
-                ResponseEntity<Integer> responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            if(clientT ==null  ){
+                ResponseEntity<JsonObject> responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 return responseEntity;
             }
             try{
-                Client client = new Client();
-                client.setDocumentClient(documentClient);
-                client.setFirstName(firstName);
-                client.setLastName(lastName);
-                client.setAge(age);
-                client.setEmail(email);
-                client.setStatus(1);
-
-                this.sqlSession.insert("insertClient", client);
-                response.add("data", Constants.GSON.toJsonTree(client));
+                 this.sqlSession.insert("insertClient", clientT);
+                response.add("data", Constants.GSON.toJsonTree(clientT));
                 response.addProperty("status", "success");
                 response.addProperty("message", "Successfully Registered");
             }catch (Exception e){
-                ResponseEntity<Integer> responseEntity = new ResponseEntity<>(HttpStatus.CONFLICT);
+                ResponseEntity<JsonObject> responseEntity = new ResponseEntity<>(HttpStatus.CONFLICT);
                 return responseEntity;
             }
-        return GeneralUtils.createOkResponse(response.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
 
     public ResponseEntity deleteLogicClient(Integer idClient){
         JsonObject response = new JsonObject();
-        log.info("deleteLogicClientr: " + idClient);
+        log.info("deleteLogicCliente: " + idClient);
         if(idClient==null){
             ResponseEntity entity = new ResponseEntity(HttpStatus.BAD_REQUEST);
             return entity;

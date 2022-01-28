@@ -8,6 +8,10 @@
         select * from clients where idClient= #{idClient} and status = 1
     </select>
 
+    <select id="getAllClients" resultType="Client">
+        select * from clients where status = 1
+    </select>
+
     <insert id="insertClient" parameterType="Client" useGeneratedKeys="true" keyProperty="idClient"  keyColumn="idClient">
         INSERT clients
         (`documentClient`,`firstNameClient`, `lastNameCLient`, `age`, `email`,`status`)

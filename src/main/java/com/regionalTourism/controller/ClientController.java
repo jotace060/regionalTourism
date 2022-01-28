@@ -1,34 +1,38 @@
 package com.regionalTourism.controller;
 
-import com.regionalTourism.commons.GeneralUtils;
+import com.regionalTourism.dto.Client;
 import com.regionalTourism.services.ClientService;
-import lombok.extern.apachecommons.CommonsLog;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@CommonsLog
-@CrossOrigin
-@RequestMapping(produces = "application/json")
+import java.util.List;
+
+//@Controller
+//@CommonsLog
+//@CrossOrigin
+//@RequestMapping(produces = "application/json")
+@RestController
 public class ClientController {
 
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private final SqlSession sqlSession;
+
+    public ClientController(SqlSession sqlSession) {
+        this.sqlSession = sqlSession;
+    }
 
     @PostMapping("/registerClient")
     @ResponseBody
-    public ResponseEntity registerNewCustomer(String documentClient,String firstName,String lastName, Integer age, String email) {
-
-     return clientService.createClient(documentClient,firstName,lastName,age,email);
-
-        }
-
-    @PostMapping("/deleteLogicClient")
-    @ResponseBody
-    public ResponseEntity deleteLogicClient(Integer idClient) {
+    public ResponseEntity registerNewCustomer(@RequestBody Client client) {
+        System.out.println("TEST");
+        return clientService.createClient(client);
+    }
+    @RequestMapping(value = "/deleteLogicClient/{idClient}", method = RequestMethod.POST, produces={"application/json"})
+     public ResponseEntity deleteLogicClient(@PathVariable Integer idClient) {
 
         return clientService.deleteLogicClient(idClient);
 
@@ -36,12 +40,26 @@ public class ClientController {
 
     @PostMapping("/updateClient")
     @ResponseBody
-    public ResponseEntity updateClient(Integer idClient, String documentClient,String firstName, String lastName, Integer age, String email,Integer status) {
-
-        return clientService.updateClient(idClient,documentClient,firstName,lastName,age,email,status);
-
-    }
+    public ResponseEntity updateClient(@RequestBody Client client) {
+        System.out.println("TESTUPDATE");
+        return clientService.updateClient(client);
 
     }
+
+    @GetMapping("/getAllClients")
+    @ResponseBody
+    public List<Client> getAllClients() {
+        return this.sqlSession.selectList("getAllClients",null);
+    }
+
+
+
+    @GetMapping("/getClientById")
+    @ResponseBody
+    public Client getAllClients(Integer idClient) {
+        return this.sqlSession.selectOne("getClientById",idClient);
+    }
+
+}
 
 
